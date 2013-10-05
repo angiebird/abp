@@ -26,6 +26,7 @@ class Loc
 
         Loc operator+=(const Loc& right);
         Loc operator/=(double n);
+        int operator==(const Loc& right);
 
         int show(){printf("%f %f\n", x, y);}
 };
@@ -40,6 +41,11 @@ Loc Loc::operator/=(double n)
 {
     this->x /= n;
     this->y /= n;
+}
+
+int Loc::operator==(const Loc& right)
+{
+    return (this->x == right.get_x())&&(this->y == right.get_y());
 }
 
 Loc operator+(const Loc& left, const Loc& right)
@@ -91,6 +97,7 @@ int dist(T a, T b)
 template <class T>
 int kmeans(T* data, int dataNum, T* ctr, int K)
 {
+    T ctr_temp[dataNum];
     int nCtr[dataNum];
     int cnt[K];
 
@@ -98,10 +105,12 @@ int kmeans(T* data, int dataNum, T* ctr, int K)
     for(int j = 0; j < K; j++)
     {
         ctr[j] = data[rand()%dataNum];
+        ctr[j].show();
     }
 
-    for(int run = 0; run < 100; run++)
-    {
+    int change;
+    do{
+        change = 0;
         // find the nearest center for each point
         for(int i = 0; i < dataNum; i++)
         {
@@ -121,29 +130,43 @@ int kmeans(T* data, int dataNum, T* ctr, int K)
         // update center
         for(int j = 0; j < K; j++)
         {
-            ctr[j].set_loc(0, 0);
+            ctr_temp[j].set_loc(0, 0);
             cnt[j] = 0;
         }
 
         for(int i = 0; i < dataNum; i++)
         {
-            ctr[nCtr[i]] += data[i];
+            ctr_temp[nCtr[i]] += data[i];
             cnt[nCtr[i]]++;
         }
 
         for(int j = 0; j < K; j++)
         {
-            ctr[j]/=cnt[j];
+            if(cnt[j] == 0)
+            {
+                ctr_temp[j] = data[rand()%dataNum];
+                change = 1;
+            }
+            else
+            {
+                ctr_temp[j]/=cnt[j];
+            }
+
+            if(!(ctr[j] == ctr_temp[j]))
+            {
+                change = 1;
+                ctr[j] = ctr_temp[j];
+            }
             //ctr[j].show();
         }
-    }
+    }while(change);
 }
 
 int main()
 {
     srand(time(NULL));
 
-    int ctrSize = 5;
+    int ctrSize = 50;
     Loc ctr[ctrSize];
 
     int vicSize = 300;
@@ -157,11 +180,11 @@ int main()
     {
         vic[i].show();
     }
+    */
 
 
     for(int j = 0; j<ctrSize; j++)
     {
-        ctr[j].show();
+        //ctr[j].show();
     }
-    */
 }
